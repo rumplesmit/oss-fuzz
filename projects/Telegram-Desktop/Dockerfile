@@ -1,4 +1,4 @@
-FROM ubuntu:16.04   
+FROM ubuntu:16.04
 MAINTAINER felipe.limaventura@gmail.com
 
 RUN apt-get update && apt-get upgrade -y && apt-get install -y gcc-5-base libgcc-5-dev g++ libstdc++-5-dev
@@ -8,11 +8,12 @@ RUN apt-get update
 RUN apt-get install -y software-properties-common
 RUN add-apt-repository ppa:ubuntu-toolchain-r/test
 RUN add-apt-repository ppa:george-edison55/cmake-3.x
-RUN apt-get update && apt-get install -y gcc-7 g++-7 cmake
-RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60
-RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 60
+RUN apt-get update && apt-get install -y gcc-8 g++-8 cmake
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 60
+RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 60
 RUN add-apt-repository --remove ppa:ubuntu-toolchain-r/test -y
 RUN add-apt-repository --remove ppa:george-edison55/cmake-3.x -y
+
 
 RUN MAKE_THREADS_CNT=-j8
 
@@ -139,7 +140,13 @@ RUN make $MAKE_THREADS_CNT
 RUN make install
 WORKDIR src/tools
 RUN ../../../gyp/gyp  --depth=. --generator-output=.. -Goutput_dir=../out tools.gyp --format=cmake
-WORKDIR ../../out/Default
+WORKDIR ../..
+WORKDIR out/Default
+
+
+RUN gcc -v
+RUN cmake --version
+
 RUN cmake .
 RUN make $MAKE_THREADS_CNT dump_syms
 WORKDIR ../../..
