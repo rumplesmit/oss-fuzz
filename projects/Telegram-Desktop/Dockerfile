@@ -4,15 +4,15 @@ MAINTAINER felipe.limaventura@gmail.com
 RUN apt-get update && apt-get upgrade -y && apt-get install -y gcc-5-base libgcc-5-dev g++ libstdc++-5-dev
 RUN apt-get install git libexif-dev liblzma-dev libz-dev libssl-dev libappindicator-dev libunity-dev libicu-dev libdee-dev libdrm-dev dh-autoreconf autoconf automake build-essential libass-dev libfreetype6-dev libgpac-dev libsdl1.2-dev libtheora-dev libtool libva-dev libvdpau-dev libvorbis-dev libxcb1-dev libxcb-image0-dev libxcb-shm0-dev libxcb-xfixes0-dev libxcb-keysyms1-dev libxcb-icccm4-dev libxcb-render-util0-dev libxcb-util0-dev libxrender-dev libasound-dev libpulse-dev libxcb-sync0-dev libxcb-randr0-dev libx11-xcb-dev libffi-dev libncurses5-dev pkg-config texi2html zlib1g-dev yasm cmake xutils-dev bison python-xcbgen -y
 
-RUN apt-get update
-RUN apt-get install -y software-properties-common
-RUN add-apt-repository ppa:ubuntu-toolchain-r/test
-RUN add-apt-repository ppa:george-edison55/cmake-3.x
-RUN apt-get update && apt-get install -y gcc-8 g++-8 cmake
-RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 60
-RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 60
-RUN add-apt-repository --remove ppa:ubuntu-toolchain-r/test -y
-RUN add-apt-repository --remove ppa:george-edison55/cmake-3.x -y
+
+#RUN apt-get install -y software-properties-common
+#RUN add-apt-repository ppa:ubuntu-toolchain-r/test
+#RUN add-apt-repository ppa:george-edison55/cmake-3.x
+#RUN apt-get update && apt-get install -y gcc-8 g++-8 cmake
+#RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 60
+#RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 60
+#RUN add-apt-repository --remove ppa:ubuntu-toolchain-r/test -y
+#RUN add-apt-repository --remove ppa:george-edison55/cmake-3.x -y
 
 
 RUN MAKE_THREADS_CNT=-j8
@@ -144,21 +144,27 @@ WORKDIR ../..
 WORKDIR out/Default
 
 
-RUN gcc -v
-RUN cmake --version
+#RUN gcc -v
+#RUN cmake --version
+
+RUN git clone https://github.com/google/googletest.git
+WORKDIR googletest/googlemock
+RUN cmake CMakeLists.txt
+RUN export CXX_FLAGS=-std=c++11
+RUN make 
 
 RUN cmake .
-RUN make $MAKE_THREADS_CNT dump_syms
-WORKDIR ../../..
-
-FROM gcr.io/oss-fuzz-base/base-builder
-
-WORKDIR ..
-WORKDIR tdesktop/Telegram
-RUN gyp/refresh.sh
-
-WORKDIR ..
-WORKDIR out/Release
-RUN make $MAKE_THREADS_CNT 
-
-COPY build.sh fuzzer.cc $SRC/
+#RUN make $MAKE_THREADS_CNT dump_syms
+#WORKDIR ../../..
+#
+#FROM gcr.io/oss-fuzz-base/base-builder
+#
+#WORKDIR ..
+#WORKDIR tdesktop/Telegram
+#RUN gyp/refresh.sh
+#
+#WORKDIR ..
+#WORKDIR out/Release
+#RUN make $MAKE_THREADS_CNT 
+#
+#COPY build.sh fuzzer.cc $SRC/
