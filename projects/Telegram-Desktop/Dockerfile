@@ -147,21 +147,62 @@ WORKDIR out/Default
 #RUN gcc -v
 #RUN cmake --version
 
+WORKDIR ../../..
 RUN git clone https://github.com/google/googletest.git
 WORKDIR googletest/googlemock
 RUN cmake CMakeLists.txt
-RUN export CXX_FLAGS=-std=c++11
-RUN make 
+RUN echo 'set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")' >> CMakeLists.txt 
+RUN echo 'set (CMAKE_CXX_STANDARD 11)' >> CMakeLists.txt
+RUN cmake CMakeLists.txt
+RUN make
+WORKDIR ../..
+
+#RUN apt-get install libgtest-dev -y
+#WORKDIR ../..
+#RUN ls
+#RUN cmake CMakeLists.txt
+#RUN make
+#WORKDIR Telegram/Libraries
+
+WORKDIR breakpad/out/Default
+RUN pwd
+RUN ls ../../src
+#RUN echo 'set(CXX_FLAGS "-std=c+11")' >> CMakeLists.txt
+
+#RUN cp googletest/googlemock/CMakeLists.txt .
+#RUN echo 'find_package(Threads REQUIRED)' >> CMakeLists.txt
+#RUN echo 'set(GTEST_LIBRARY "$ENV{GTEST_LIBRARY}")' >> CMakeLists.txt
+#RUN echo 'set(GTEST_MAIN_LIBRARY "$ENV{GTEST_LIBRARY}")' >> CMakeLists.txt
+
+#inicio solucao 1
+#RUN echo 'set(CMAKE_CXX_SOURCE_FILE_EXTENSIONS C;M;c++;cc;cpp;cxx;mm;CPP)' >> CMakeLists.txt
+#RUN echo 'set(GTEST_DIR "../../../googletest/googletest" CACHE PATH "Path to googletest")' >> CMakeLists.txt
+#RUN echo 'set(gmock_SOURCE_DIR "../../../googletest/googlemock" CACHE PATH "Path to googletest")' >> CMakeLists.txt
+#RUN echo 'set(GTEST_INCLUDE_DIRECTORIES ${GTEST_DIR}/include ${GTEST_DIR} ${GTEST_DIR}/src)' >> CMakeLists.txt
+#RUN echo 'include_directories("${GTEST_INCLUDE_DIRECTORIES}")' >> CMakeLists.txt 
+#RUN echo 'add_library("gtest ${GTEST_DIR}/src/gtest-all.cc ${GTEST_DIR}/src/gtest_main.cc")' >> CMakeLists.txt
+#RUN echo ' enable_testing(true)' >> CMakeLists.txt
+#RUN echo 'include_directories(${gmock_SOURCE_DIR}/include ${gmock_SOURCE_DIR} ${gmock_SOURCE_DIR}/gtest/include ${gmock_SOURCE_DIR}/gtest)' >> CMakeLists.txt
+#fim solucao 1
+
+RUN echo 'set_target_properties(../../src/testing/googlemock/src/gmock-all.cc PROPERTIES LINKER_LANGUAGE CXX)' >> CMakeLists.txt
+
+#RUN echo 'find_package(GTest REQUIRED)' >> CMakeLists.txt
+#RUN echo 'include_directories(${GTEST_INCLUDE_DIRS})' >> CMakeLists.txt
+#RUN echo 'include_directories("$ENV{GMOCK_DIR}/include")' >> CMakeLists.txt
+#RUN echo 'find_package(GMock REQUIRED)' >> CMakeLists.txt
+
+#RUN echo 'target_link_libraries(${target} GTest::GTest GTest::Main)' >> CMakeLists.txt
 
 RUN cmake .
-#RUN make $MAKE_THREADS_CNT dump_syms
-#WORKDIR ../../..
+RUN make $MAKE_THREADS_CNT dump_syms
+WORKDIR ../../..
 #
-#FROM gcr.io/oss-fuzz-base/base-builder
+FROM gcr.io/oss-fuzz-base/base-builder
 #
-#WORKDIR ..
-#WORKDIR tdesktop/Telegram
-#RUN gyp/refresh.sh
+WORKDIR ..
+WORKDIR tdesktop/Telegram
+RUN gyp/refresh.sh
 #
 #WORKDIR ..
 #WORKDIR out/Release
